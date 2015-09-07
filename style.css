@@ -1,0 +1,10 @@
+* { padding: 0; margin: 0; border: 0; color: white; font-family: "Open Sans", "Helvetica", sans-serif;  }
+html, body { width: 100%; height: 100%; overflow: hidden; background: black; }
+body { position: relative; }
+video, #text-container, #settings { position: absolute; width: 100%; height: 100%; }
+.valign-container { display: table; transition: opacity .3s; opacity: 1; }
+.valign { display: table-cell; vertical-align: middle; text-align: center; }
+#text-container { background: black; }
+#text { font-size: 1rem; font-size: 5vw; }
+#settings { display: none; background: rgba(0,0,0,0.5); padding: 16px; }
+#settings input[type=range] { vertical-align: middle; }
