@@ -1,10 +1,12 @@
 const WIDTH = window.innerWidth;
 const HEIGHT = window.innerHeight;
-const ACCEL = 0.0016;
+const ACCEL = 0.033;
 var Sensitivity = 0.5;
+var Speed = 1;
 
 // video stuff
-var video, text, textContainer, prevCurrentTime = 0, prevPlaybackRate = 0, playbackRate = 0;
+var video, prevCurrentTime = 0, prevPlaybackRate = 0, playbackRate = 0, playing = false, ended = false;
+var introText, introContainer, outroText, outroContainer, outroTextTimer;
 
 // microphone stuff
 var audioCtx, analyser, dataArray, bufferLength;
@@ -15,12 +17,13 @@ var frameCount = 0;
 var fps = 30;
 var fpsInterval, startTime, now, then, elapsed;
 
-// settings stuff
-var settings;
+// overlay stuff
+var overlay;
 var sensitivitySlider;
+var speedSlider;
 
 window.onload = init;
-window.onkeypress = onKeyPress;
+window.onkeyup = onKeyUp;
 
 function startDraw() {
 	fpsInterval = 1000 / fps;
@@ -31,7 +34,9 @@ function startDraw() {
 }
 
 function draw() {
-	drawVisual = requestAnimationFrame(draw);
+	if (!ended) {
+		drawVisual = requestAnimationFrame(draw);
+	}
 
 	// calc elapsed time since last loop
 	now = Date.now();
@@ -57,40 +62,44 @@ function draw() {
 
 		if (playbackRate == 0) {
 			if (avg > Sensitivity) {
-				var d = ACCEL * (1 + avg - Sensitivity);
-				playbackRate += d;
+				playbackRate += ACCEL * Speed;
 				video.play();
 			}
 		} else {
 			if (playbackRate <= 0.1 && avg > Sensitivity) {
-				var d = ACCEL * (1 + avg - Sensitivity);
-				playbackRate += d;
+				playbackRate = ACCEL * Speed;
 			} else if (playbackRate >= -0.1) {
-				if (playbackRate > 0 && !((video.duration - video.currentTime) <= 1 / fps)) {
+				if (playbackRate > 0 && !((video.duration() - video.currentTime()) <= 1 / fps)) {
 					playbackRate = 0;
 				}
-				var d = ACCEL / (1 + -(avg - Sensitivity));
-				playbackRate -= d;
+				playbackRate = -ACCEL * Speed * 2;
 			}
 		}
 
-		video.currentTime += playbackRate;
-		if (video.currentTime <= 1 / fps) {
-			playbackRate = 0;
-			video.currentTime = 0;
-			text.innerHTML = "Hi. Make some noise.";
-			textContainer.style.opacity = 1;
-		} else if ((video.duration - video.currentTime) <= 1 / fps) {
-			console.log(video.duration + " " + video.currentTime);
-			video.currentTime = video.duration - 1 / fps;
-			text.innerHTML = "It's great to be with you here in Reykjavik!";
-			textContainer.style.opacity = 1;
-			playbackRate = 1;
+		video.currentTime(video.currentTime() + playbackRate);
+		if (video.currentTime() <= (1 / fps)) {
+			if (playing) {
+				console.log("Reached the beginning");
+				introContainer.style.opacity = 1;
+				outroContainer.style.display = "table";
+				window.clearTimeout(outroTextTimer);
+				playing = false;
+			}
+		} else if (Math.abs(video.duration() - video.currentTime()) < (1 / fps)) {
+			if (playing) {
+				console.log("Reached the end");
+				outroContainer.style.opacity = 1;
+				outroTextTimer = window.setTimeout(function() { outroText.style.opacity = 1; }, 2000);
+				video.pause();
+				video.currentTime(video.duration());
+				playing = false;
+				ended = true;
+				return;
+			}
 		} else {
-			textContainer.style.opacity = 0;
+			playing = true;
+			introContainer.style.opacity = 0;
 		}
-
-		//console.log("currentTime: " + video.currentTime + " playbackRate: " + playbackRate);
 	}
 };
 
@@ -157,48 +166,109 @@ function onMicrophoneReady(stream) {
 	volume.connect(analyser);
 
 	initVideo();
-	initSettings();
+	initOverlay();
 }
 
 function initVideo() {
 	playbackRate = 0;
-	video = document.getElementById("video");
+	video = videojs(document.getElementById("video"));
 	video.load();
-	video.playbackRate = 0;
-	video.onended = function(e) { e.target.play(); }
-	video.onloadeddata = function(e) { console.log("Video is ready!"); startDraw(); }
-	text = document.getElementById("text");
-	textContainer = document.getElementById("text-container");
+	video.playbackRate(1);
+	video.on("loadeddata", function(e) { console.log("Video is ready!"); console.log(video.seekable()); startDraw(); });
+	introText = document.getElementById("intro-text");
+	outroText = document.getElementById("outro-text");
+	introContainer = document.getElementById("intro-container");
+	outroContainer = document.getElementById("outro-container");
 }
 
-function initSettings() {
-	settings = document.getElementById("settings");
+function initOverlay() {
+	overlay = document.getElementById("overlay");
+
+	credits = document.getElementById("credits");
+	credits.onclick = function(evt) {
+		credits.style.display = "none";
+	}
+
+	restartButton = document.getElementById("restartButton");
+	restartButton.onclick = function(evt) {
+		restart();
+	}
+
+	creditsButton = document.getElementById("creditsButton");
+	creditsButton.onclick = function(evt) {
+		credits.style.display = "table";
+	}
+
+	fullscreenButton = document.getElementById("fullscreenButton");
+	fullscreenButton.onclick = function(evt) {
+		if (document.body.requestFullscreen) {
+			document.body.requestFullscreen();
+		} else if (document.body.msRequestFullscreen) {
+			document.body.msRequestFullscreen();
+		} else if (document.body.mozRequestFullscreen) {
+			document.body.mozRequestFullscreen();
+		} else if (document.body.webkitRequestFullscreen) {
+			document.body.webkitRequestFullscreen();
+		}
+	}
 
 	sensitivitySlider = document.getElementById("sensitivity");
 	var storedSensitivity = localStorage.getItem("sensitivity");
 	if (storedSensitivity) {
 		Sensitivity = storedSensitivity;
 		sensitivity.value = (Sensitivity * 100).toFixed(0);
-		console.log(sensitivity.value);
 	}
 
 	sensitivitySlider.onchange = function(evt) {
 		Sensitivity = evt.target.value / 100;
 		localStorage.setItem("sensitivity", Sensitivity);
 	}
+
+	speedSlider = document.getElementById("speed");
+	var storedSpeed = localStorage.getItem("speed");
+	if (storedSpeed) {
+		Speed = storedSpeed;
+		speed.value = (Speed * 100).toFixed(0);
+	}
+
+	speedSlider.onchange = function(evt) {
+		Speed = evt.target.value / 100 + 1;
+		if (Speed < 1) {
+			Speed = 1;
+		}
+		localStorage.setItem("speed", Speed);
+	}
 }
 
-function onKeyPress(evt) {
+function onKeyUp(evt) {
 	var key = evt.charCode || evt.keyCode;
 	switch (key) {
-	case 96:
-		if (settings) {
-			if (settings.style.display == "table-cell") {
-				settings.style.display = "none";
+	case 192:
+		if (overlay) {
+			if (overlay.style.display == "table-cell") {
+				overlay.style.display = "none";
 			} else {
-				settings.style.display = "table-cell";
+				overlay.style.display = "table-cell";
 			}
 		}
 		break;
+	case 27:
+		if (credits) {
+			if (credits.style.display == "table") {
+				credits.style.display = "none";
+			}
+		}
 	}
+}
+
+function restart() {
+	playing = true;
+	ended = false;
+	video.currentTime(0);
+	outroContainer.style.display = "none";
+	outroContainer.style.opacity = 0;
+	introContainer.style.opacity = 1;
+	outroText.style.opacity = 0;
+	window.clearTimeout(outroTextTimer);
+	startDraw();
 }

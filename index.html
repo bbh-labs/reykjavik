@@ -3,19 +3,66 @@
 <head>
 	<link href='https://fonts.googleapis.com/css?family=Open+Sans' rel='stylesheet' type='text/css'/>
 
+	<link href="//vjs.zencdn.net/4.12/video-js.css" rel="stylesheet">
+	<script src="//vjs.zencdn.net/4.12/video.js"></script>
+
 	<link href="style.css" rel="stylesheet" />
 	<script src="script.js"></script>
 </head>
 <body>
-	<video id="video" src="video.mp4" width="100%" height="100%" preload="auto"></video>
-	<div id="text-container" class="valign-container">
+	<audio autoplay loop>
+		<source src="audio.ogg" type="audio/ogg" />
+		<source src="audio.mp3" type="audio/mpeg" />
+		<source src="audio.wav" type="audio/wave" />
+		<source src="audio.wav" type="audio/x-wav" />
+		<source src="audio.flac" type="audio/flac" />
+	</audio>
+	<video id="video" class="video-js vjs-default-skin" width="100%" height="100%" data-setup='{"controls": false, "preload": "auto"}'>
+		<source src="video.mp4" type="video/mp4" />
+		<source src="video.webm" type="video/webm" />
+		<source src="video.ogv" type="video/ogg" />
+	</video>
+	<div id="intro-container" class="valign-container">
 		<div class="valign">
-			<h1 id="text">Hi. Make some noise.</h1>
+			<h1 id="intro-text">Hi. Make some noise.</h1>
 		</div>
 	</div>
-	<div id="settings">
-		<label>Sensitivity</label>
-		<input id="sensitivity" type="range" />
+	<div id="outro-container" class="valign-container">
+		<div class="valign">
+			<h1 id="outro-text">It's great to be with you here in Reykjavik!</h1>
+		</div>
+	</div>
+	<div id="overlay">
+		<div id="settings">
+			<div>
+				<label>Threshold</label>
+				<input id="sensitivity" type="range" />
+			</div>
+			<div>
+				<label>Speed</label>
+				<input id="speed" type="range" />
+			</div>
+		</div>
+		<div id="credits" class="valign-container">
+			<div class="valign">
+				<h1>Video by the Kissinger Twins</h1>
+				<h1>Software by BBH Maker Lab</h1>
+				<h1>Copywriting by Pete Callaghan</h1>
+			</div>
+		</div>
+		<div id="restartButtonContainer" class="valign-container">
+			<div class="valign-bottom">
+				<button id="restartButton">Restart</button>
+			</div>
+		</div>
+		<div id="creditsButtonContainer" class="valign-container">
+			<div class="valign-bottom">
+				<button id="creditsButton">Credits</button>
+			</div>
+		</div>
+		<div id="fullscreenButtonContainer">
+			<button id="fullscreenButton">Fullscreen</button>
+		</div>
 	</div>
 </body>
 </html>
