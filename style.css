@@ -1,31 +1,15 @@
 * { padding: 0; margin: 0; border: 0; color: white; font-family: "Open Sans", "Helvetica", sans-serif;  }
-html, body { width: 100%; height: 100%; overflow: hidden; background: black; }
-body { position: relative; }
-video, .video-js, #intro-container, #outro-container, #overlay { position: absolute; width: 100%; height: 100%; }
-.vjs-loading-spinner { display: none !important; }
+html, body, #root { width: 100%; height: 100%; overflow: hidden; background: black; }
+body, #root { position: relative; }
+iframe, a, button { pointer-events: auto; }
+button { cursor: pointer; color: white; background: rgba(255,255,255,0); border: 1px solid white; padding: 16px; transition: background .3s; }
+button:hover { color: black; background: rgba(255,255,255,1); }
 .valign-container { display: table; }
-.valign { display: table-cell; vertical-align: middle; text-align: center; }
-.valign-bottom { display: table-cell; vertical-align: bottom; text-align: right; }
-
-#intro-container { background: black; transition: opacity .3s; opacity: 1; }
-#outro-container { background: black; transition: opacity 2s; opacity: 0; }
-#intro-text, #outro-text { font-size: 1rem; font-size: 5vw; }
-#outro-text { opacity : 0; transition: opacity 2s; }
-#overlay { display: none; background: rgba(0,0,0,0.5); padding: 16px; }
-#overlay input[type=range] { vertical-align: middle; }
-
-#settings, #credits { position: absolute; }
-#settings label { display: inline-block; width: 100px; }
-#credits { background: rgba(0,0,0,0.9); width: 100%; height: 100%; display: none; top: 0; left: 0; }
-
-#restartButtonContainer { position: absolute; width: 100%; height: 100%; pointer-events: none; }
-#restartButton { float: left; margin-bottom: 3rem; padding: 16px; background: rgba(255,255,255,0); border: 1px solid white; cursor: pointer; transition: background .2s; pointer-events: auto; }
-#restartButton:hover { background: rgba(255,255,255,0.25); }
-
-#creditsButtonContainer { position: absolute; width: 100%; height: 100%; pointer-events: none; }
-#creditsButton { margin: 0 3rem 3rem 0; padding: 16px; background: rgba(255,255,255,0); border: 1px solid white; cursor: pointer; transition: background .2s; pointer-events: auto; }
-#creditsButton:hover { background: rgba(255,255,255,0.25); }
-
-#fullscreenButtonContainer { position: absolute; width: 100%; height: 100%; pointer-events: none; }
-#fullscreenButton { float: right; margin-right: 3rem; padding: 16px; background: rgba(255,255,255,0); border: 1px solid white; cursor: pointer; transition: background .2s; pointer-events: auto; }
-#fullscreenButton:hover { background: rgba(255,255,255,0.25); }
+.valign { display: table-cell; vertical-align: middle; }
+.valign-bottom { display: table-cell; vertical-align: bottom; }
+.text-left { text-align: left; }
+.text-right { text-align: right; }
+.text-center { text-align: center; }
+.black-text { color: black; }
+.vjs-loading-spinner { display: none !important; }
+.fb-share-button { margin: 0 16px; bottom: 5px; }
