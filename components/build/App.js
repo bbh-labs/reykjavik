@@ -1,4 +1,4 @@
-'use strict';
+"use strict";
 
 var dispatcher = new Flux.Dispatcher();
 
@@ -13,7 +13,8 @@ var App = React.createClass({
         var storedOutroText = localStorage.getItem('outroText');
         return {
             introText: storedIntroText ? storedIntroText : 'Hi. Make some noise.',
-            outroText: storedOutroText ? storedOutroText : 'It\'s great to be with you here in Reykjavik!'
+            outroText: storedOutroText ? storedOutroText : 'It\'s great to be with you here in Reykjavik!',
+            loaded: false
         };
     },
     componentDidMount: function componentDidMount() {
@@ -80,6 +81,7 @@ var App = React.createClass({
     render: function render() {
         var introText = this.state.introText;
         var outroText = this.state.outroText;
+        var loaded = this.state.loaded;
         return React.createElement(
             'div',
             null,
@@ -88,7 +90,8 @@ var App = React.createClass({
             React.createElement(App.Intro, { ref: 'intro', text: introText }),
             React.createElement(App.Outro, { ref: 'outro', text: outroText }),
             React.createElement(App.Overlay, { ref: 'overlay' }),
-            React.createElement(App.Settings, { ref: 'settings', introText: introText, outroText: outroText })
+            React.createElement(App.Settings, { ref: 'settings', introText: introText, outroText: outroText }),
+            React.createElement(App.LoadingScreen, { loaded: loaded })
         );
     },
     onMicrophoneReady: function onMicrophoneReady(stream) {
@@ -132,7 +135,7 @@ var App = React.createClass({
         video.load();
         video.playbackRate(1);
         video.on('loadeddata', (function (e) {
-            console.log('Video is ready!');
+            this.setState({ loaded: true });
             this.startDraw();
         }).bind(this));
     },
@@ -311,8 +314,6 @@ App.Intro = React.createClass({
         text: {
             width: '80%',
             margin: '0 auto',
-            fontSize: '2em',
-            fontSize: '2rem',
             fontSize: '5vw'
         }
     },
@@ -364,8 +365,6 @@ App.Outro = React.createClass({
         text: {
             width: '80%',
             margin: '0 auto',
-            fontSize: '2em',
-            fontSize: '2rem',
             fontSize: '5vw',
             transition: 'opacity 2s',
             opacity: 0
@@ -663,6 +662,53 @@ App.Settings = React.createClass({
     },
     speed: function speed(value) {
         this.refs.speed.getDOMNode().value = value;
+    }
+});
+
+App.LoadingScreen = React.createClass({
+    displayName: 'LoadingScreen',
+
+    styles: {
+        container: {
+            position: 'absolute',
+            width: '100%',
+            height: '100%',
+            background: 'black',
+            pointerEvents: 'none',
+            transition: 'opacity 1s',
+            opacity: 1
+        },
+        spinner: {
+            position: 'absolute',
+            top: '50%',
+            left: '50%',
+            margin: '0 auto'
+        },
+        hide: {
+            opacity: 0
+        }
+    },
+    render: function render() {
+        return React.createElement(
+            'div',
+            { style: m(this.styles.container, this.props.loaded && this.styles.hide), className: 'valign-wrapper' },
+            React.createElement(
+                'div',
+                { className: 'valign sk-circle', style: this.styles.spinner },
+                React.createElement('div', { className: 'sk-circle1 sk-child' }),
+                React.createElement('div', { className: 'sk-circle2 sk-child' }),
+                React.createElement('div', { className: 'sk-circle3 sk-child' }),
+                React.createElement('div', { className: 'sk-circle4 sk-child' }),
+                React.createElement('div', { className: 'sk-circle5 sk-child' }),
+                React.createElement('div', { className: 'sk-circle6 sk-child' }),
+                React.createElement('div', { className: 'sk-circle7 sk-child' }),
+                React.createElement('div', { className: 'sk-circle8 sk-child' }),
+                React.createElement('div', { className: 'sk-circle9 sk-child' }),
+                React.createElement('div', { className: 'sk-circle10 sk-child' }),
+                React.createElement('div', { className: 'sk-circle11 sk-child' }),
+                React.createElement('div', { className: 'sk-circle12 sk-child' })
+            )
+        );
     }
 });
 

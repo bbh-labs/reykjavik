@@ -1,3 +1,5 @@
+"use strict";
+
 var dispatcher = new Flux.Dispatcher();
 
 var App = React.createClass({
@@ -10,6 +12,7 @@ var App = React.createClass({
         return {
             introText: storedIntroText ? storedIntroText : 'Hi. Make some noise.',
             outroText: storedOutroText ? storedOutroText : 'It\'s great to be with you here in Reykjavik!',
+            loaded: false,
         };
     },
     componentDidMount: function() {
@@ -76,6 +79,7 @@ var App = React.createClass({
     render: function() {
         var introText = this.state.introText;
         var outroText = this.state.outroText;
+        var loaded = this.state.loaded;
         return (
             <div>
                 <App.Audio ref='audio' />
@@ -84,6 +88,7 @@ var App = React.createClass({
                 <App.Outro ref='outro' text={outroText} />
                 <App.Overlay ref='overlay' />
                 <App.Settings ref='settings' introText={introText} outroText={outroText} />
+                <App.LoadingScreen loaded={loaded} />
             </div>
         )
     },
@@ -128,7 +133,7 @@ var App = React.createClass({
         video.load();
         video.playbackRate(1);
         video.on('loadeddata', function(e) {
-            console.log('Video is ready!');
+            this.setState({ loaded: true });
             this.startDraw();
         }.bind(this));
     },
@@ -301,8 +306,6 @@ App.Intro = React.createClass({
         text: {
             width: '80%',
             margin: '0 auto',
-            fontSize: '2em',
-            fontSize: '2rem',
             fontSize: '5vw',
         },
     },
@@ -348,8 +351,6 @@ App.Outro = React.createClass({
         text: {
             width: '80%',
             margin: '0 auto',
-            fontSize: '2em',
-            fontSize: '2rem',
             fontSize: '5vw',
             transition: 'opacity 2s',
             opacity: 0,
@@ -553,6 +554,49 @@ App.Settings = React.createClass({
     },
     speed: function(value) {
         this.refs.speed.getDOMNode().value = value;
+    },
+});
+
+App.LoadingScreen = React.createClass({
+    styles: {
+        container: {
+            position: 'absolute',
+            width: '100%',
+            height: '100%',
+            background: 'black',
+            pointerEvents: 'none',
+            transition: 'opacity 1s',
+            opacity: 1,
+        },
+        spinner: {
+            position: 'absolute',
+            top: '50%',
+            left: '50%',
+            margin: '0 auto',
+        },
+        hide: {
+            opacity: 0,
+        },
+    },
+    render: function() {
+        return (
+            <div style={m(this.styles.container, this.props.loaded && this.styles.hide)} className='valign-wrapper'>
+                <div className='valign sk-circle' style={this.styles.spinner}>
+                    <div className='sk-circle1 sk-child'></div>
+                    <div className='sk-circle2 sk-child'></div>
+                    <div className='sk-circle3 sk-child'></div>
+                    <div className='sk-circle4 sk-child'></div>
+                    <div className='sk-circle5 sk-child'></div>
+                    <div className='sk-circle6 sk-child'></div>
+                    <div className='sk-circle7 sk-child'></div>
+                    <div className='sk-circle8 sk-child'></div>
+                    <div className='sk-circle9 sk-child'></div>
+                    <div className='sk-circle10 sk-child'></div>
+                    <div className='sk-circle11 sk-child'></div>
+                    <div className='sk-circle12 sk-child'></div>
+                </div>
+            </div>
+        )
     },
 });
 
