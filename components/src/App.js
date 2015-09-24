@@ -405,20 +405,24 @@ App.Overlay = React.createClass({
         showCredits: {
             opacity: 1,
         },
+        closeCredits: {
+            pointerEvents: 'none',
+        },
     },
     getInitialState: function() {
         return { showCredits: false, fullscreen: false };
     },
     render: function() {
+        var showCredits = this.state.showCredits;
         return (
         	<div style={this.styles.container}>
-        		<div style={m(this.styles.container, this.styles.credits, this.state.showCredits && this.styles.showCredits)} className='valign-container'>
+                <div className='valign-container' style={m(this.styles.container, this.styles.credits, showCredits && this.styles.showCredits)}>
         			<div className='valign text-center'>
         				<h1>Video by the Kissinger Twins</h1>
         				<h1>Software by Jacky Boen</h1>
         				<h1>Copywriting by Peter Callaghan</h1>
                         <br/>
-                        <button onClick={this.handleCloseCredits}>Close</button>
+                        <button style={m(this.styles.closeCredits, showCredits && { pointerEvents: 'auto' })} onClick={this.handleCloseCredits}>Close</button>
         			</div>
         		</div>
                 <div style={this.styles.container}>

@@ -424,18 +424,22 @@ App.Overlay = React.createClass({
         },
         showCredits: {
             opacity: 1
+        },
+        closeCredits: {
+            pointerEvents: 'none'
         }
     },
     getInitialState: function getInitialState() {
         return { showCredits: false, fullscreen: false };
     },
     render: function render() {
+        var showCredits = this.state.showCredits;
         return React.createElement(
             'div',
             { style: this.styles.container },
             React.createElement(
                 'div',
-                { style: m(this.styles.container, this.styles.credits, this.state.showCredits && this.styles.showCredits), className: 'valign-container' },
+                { className: 'valign-container', style: m(this.styles.container, this.styles.credits, showCredits && this.styles.showCredits) },
                 React.createElement(
                     'div',
                     { className: 'valign text-center' },
@@ -457,7 +461,7 @@ App.Overlay = React.createClass({
                     React.createElement('br', null),
                     React.createElement(
                         'button',
-                        { onClick: this.handleCloseCredits },
+                        { style: m(this.styles.closeCredits, showCredits && { pointerEvents: 'auto' }), onClick: this.handleCloseCredits },
                         'Close'
                     )
                 )
